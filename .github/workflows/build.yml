@@ -8,20 +8,39 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - name: Descomprimir proyecto
         run: unzip -q -o EstebanTV.zip
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.7
           build-root-directory: EstebanTV
+
       - name: Compilar
         working-directory: EstebanTV
-        run: gradle assembleDebug --no-daemon
-      - uses: actions/upload-artifact@v4
+        run: |
+          set +e
+          gradle assembleDebug --no-daemon --console=plain --stacktrace > build.log 2>&1
+          code=$?
+          echo "=== ERRORES ==="
+          grep -E "^e: |What went wrong|error:" -A3 build.log | head -60
+          exit $code
+
+      - name: Guardar log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: EstebanTV/build.log
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
         with:
           name: EstebanTV-apk
           path: EstebanTV/app/build/outputs/apk/debug/app-debug.apk
