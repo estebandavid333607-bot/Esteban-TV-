@@ -1,9 +1,0 @@
-<resources>
-    <string name="app_name">Esteban TV</string>
-    <string name="app_name_caps">ESTEBAN TV</string>
-    <string name="made_by">Hecho por: Esteban Ruiz</string>
-    <string name="loading">Cargando…</string>
-    <string name="tagline">Navega y reproduce tus videos</string>
-    <string name="favorites">FAVORITOS</string>
-    <string name="url_hint">Buscar o escribir dirección</string>
-</resources>
