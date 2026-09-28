@@ -1,19 +1,23 @@
-name: Descomprimir zip
+name: Build APK
 on:
+  push:
   workflow_dispatch:
-permissions:
-  contents: write
 jobs:
-  unzip:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: |
-          unzip -q -o EstebanTV.zip -d tmp_unzip
-          rsync -a --exclude='.github' tmp_unzip/EstebanTV/ ./
-          rm -rf tmp_unzip EstebanTV.zip
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add -A
-          git commit -m "Versión 2.2" || echo "sin cambios"
-          git push
+      - run: unzip -o -q EstebanTV.zip
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.7
+      - run: gradle assembleDebug --no-daemon
+        working-directory: EstebanTV
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EstebanTV-apk
+          path: EstebanTV/app/build/outputs/apk/debug/app-debug.apk
